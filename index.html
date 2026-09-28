@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -118,21 +118,38 @@
     font-size: 13px;
     text-align: center;
   }
-
-  .lang { display:inline-flex; gap:4px; margin-left:16px; vertical-align:middle; font-size:14px; }
-  .lang button { font:inherit; color:var(--text-secondary); background:none; border:1px solid var(--border); border-radius:8px; padding:3px 10px; cursor:pointer; }
-  .lang button.on { color:var(--text); background:var(--surface); }
-  html[lang="ru"] [lang="en"], html[lang="en"] [lang="ru"] { display:none; }
+  /* Язык: ?lang=… или язык браузера; без JS — русский. */
+  html[data-lang="ru"] .lang-en, html[data-lang="en"] .lang-ru { display: none !important; }
+  .lang-switch { display: flex; justify-content: flex-end; gap: 14px; font-size: 14px; margin-bottom: 8px; }
+  .lang-switch a { color: var(--text-secondary); }
+  html[data-lang="ru"] .lang-switch a[data-lang="ru"],
+  html[data-lang="en"] .lang-switch a[data-lang="en"] { color: var(--accent); font-weight: 600; }
 </style>
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search).get('lang');
+    var langs = navigator.languages || [navigator.language || 'ru'];
+    var browserRu = langs.some(function (l) { return /^(ru|uk|be|kk)/i.test(l); });
+    var lang = q === 'en' || q === 'ru' ? q : (browserRu ? 'ru' : 'en');
+    document.documentElement.setAttribute('data-lang', lang);
+    document.documentElement.lang = lang;
+    if (lang === 'en') document.title = 'Privacy Policy — Foliant';
+  })();
+</script>
 </head>
 <body>
-<div class="container" lang="ru">
+<div class="container">
+  <nav class="lang-switch" aria-label="Language">
+    <a href="?lang=ru" data-lang="ru">Русский</a>
+    <a href="?lang=en" data-lang="en">English</a>
+  </nav>
 
+<div lang="ru" class="lang-ru">
   <header>
     <span class="logo">
       <img class="logo-mark" src="icon.png" alt="">
       <span class="logo-text">Фолиант</span>
-    </span><div class="lang"><button data-l="ru">Русский</button><button data-l="en">English</button></div>
+    </span>
     <h1>Политика конфиденциальности</h1>
     <p class="meta">Действует с 25 сентября 2026 г.</p>
   </header>
@@ -197,17 +214,15 @@
   <h2>Контакт</h2>
   <p>По вопросам конфиденциальности: <a href="mailto:yana.k84@icloud.com">yana.k84@icloud.com</a></p>
 
-  <footer>
-    © 2026 Фолиант
-  </footer>
+  
 </div>
-<div class="container" lang="en">
 
+<div lang="en" class="lang-en">
   <header>
     <span class="logo">
       <img class="logo-mark" src="icon.png" alt="">
       <span class="logo-text">Foliant</span>
-    </span><div class="lang"><button data-l="ru">Русский</button><button data-l="en">English</button></div>
+    </span>
     <h1>Privacy Policy</h1>
     <p class="meta">Effective September 25, 2026</p>
   </header>
@@ -272,22 +287,12 @@
   <h2>Contact</h2>
   <p>Privacy questions: <a href="mailto:yana.k84@icloud.com">yana.k84@icloud.com</a></p>
 
+  
+</div>
+
   <footer>
-    © 2026 Foliant
+    © 2026 Фолиант · Foliant
   </footer>
 </div>
-<script>
-(function(){
-  var h=document.documentElement, q=new URLSearchParams(location.search).get('lang');
-  var nav=(navigator.languages||[navigator.language||'']).join(',').toLowerCase();
-  var l=q==='en'||q==='ru'?q:(/(^|,)(ru|uk|be|kk)/.test(nav)?'ru':'en');
-  var T={ru:'Политика конфиденциальности — Фолиант',en:'Privacy Policy — Foliant'};
-  function set(x){h.lang=x;document.title=T[x];
-    document.querySelectorAll('.lang button').forEach(function(b){b.className=b.dataset.l===x?'on':''});}
-  set(l);
-  document.addEventListener('click',function(e){var b=e.target.closest('.lang button');if(!b)return;
-    set(b.dataset.l);history.replaceState(null,'','?lang='+b.dataset.l);});
-})();
-</script>
 </body>
 </html>
